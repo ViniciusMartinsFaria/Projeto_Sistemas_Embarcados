@@ -20,18 +20,18 @@
     #define HEIGHT 64
 #endif
 
-// Buffers na MemÛria
-unsigned char img_gray[WIDTH * HEIGHT]; // Buffer intermedi·rio (Cinza)
+// Buffers na Mem√≥ria
+unsigned char img_gray[WIDTH * HEIGHT]; // Buffer intermedi√°rio (Cinza)
 unsigned char img_out[WIDTH * HEIGHT];  // Buffer final (Sobel)
 
-// Converte RGB para Escala de Cinza (MÈtodo R·pido)
+// Converte RGB para Escala de Cinza (M√©todo R√°pido)
 unsigned char rgb_to_gray(unsigned char r, unsigned char g, unsigned char b) {
-    // FÛrmula: (77R + 150G + 29B) / 256
+    // F√≥rmula: (77R + 150G + 29B) / 256
     unsigned int temp = (77 * r) + (150 * g) + (29 * b);
     return (unsigned char)(temp >> 8);
 }
 
-// Pega pixel com seguranÁa (retorna 0 se for borda/fora)
+// Pega pixel com seguran√ßa (retorna 0 se for borda/fora)
 unsigned char get_pixel(int x, int y) {
     if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) return 0;
     return img_gray[y * WIDTH + x];
@@ -47,8 +47,8 @@ int main()
 
     int i, x, y;
 
-    // ETAPA 1: CONVERS√O RGB -> GRAY (SOFTWARE)
-    PERF_BEGIN(PCM_BASE, 1); // SeÁ„o 1 do contador
+    // CONVERS√ÉO RGB -> GRAY (SOFTWARE)
+    PERF_BEGIN(PCM_BASE, 1);
 
     for(i = 0; i < WIDTH * HEIGHT; i++) {
         img_gray[i] = rgb_to_gray(R_raw[i], G_raw[i], B_raw[i]);
@@ -56,7 +56,7 @@ int main()
 
     PERF_END(PCM_BASE, 1);
 
-    // ETAPA 2: FILTRO SOBEL (SOFTWARE PURO)
+    // FILTRO SOBEL (SOFTWARE PURO)
     PERF_BEGIN(PCM_BASE, 2);
 
     for(y = 1; y < HEIGHT - 1; y++) {
@@ -67,7 +67,7 @@ int main()
             int p02 = get_pixel(x+1, y-1);
 
             int p10 = get_pixel(x-1, y);
-            // int p11 = get_pixel(x, y); // Centro n„o È usado no c·lculo
+            // int p11 = get_pixel(x, y); // Centro n√£o √© usado no c√°lculo
             int p12 = get_pixel(x+1, y);
 
             int p20 = get_pixel(x-1, y+1);
@@ -80,7 +80,7 @@ int main()
 
             int magnitude = (int) sqrt((double)(gx*gx + gy*gy));
 
-            // 4. SaturaÁ„o (Clamp) para 8 bits
+            // 4. Satura√ß√£o (Clamp) para 8 bits
             if (magnitude > 255) {
                 magnitude = 255;
             }
@@ -94,11 +94,11 @@ int main()
 
 
     alt_putstr("\n--- TEMPOS DE EXECUCAO (Ciclos de Clock) ---\n");
-    // SeÁ„o 1 = RGB->Gray, SeÁ„o 2 = Sobel SW
+    // Se√ß√£o 1 = RGB->Gray, Se√ß√£o 2 = Sobel SW
     perf_print_formatted_report((void*) PCM_BASE, ALT_CPU_FREQ, 2, "RGB_Gray_SW", "Sobel_SW");
 
     alt_putstr("\n--- DADOS DA IMAGEM PROCESSADA (HEX) ---\n");
-    // Imprime a matriz completa para verificaÁ„o externa
+    // Imprime a matriz completa para verifica√ß√£o externa
     for(i = 0; i < WIDTH * HEIGHT; i++) {
         alt_printf("%x ", img_out[i]);
 

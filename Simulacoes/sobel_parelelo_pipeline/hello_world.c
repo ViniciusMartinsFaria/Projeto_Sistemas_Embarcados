@@ -29,12 +29,11 @@
 unsigned char img_gray[WIDTH * HEIGHT];
 unsigned char img_sobel[WIDTH * HEIGHT];
 
-// FunÁ„o RGB -> Gray
+// Fun√ß√£o RGB -> Gray
 unsigned char to_gray(unsigned char r, unsigned char g, unsigned char b) {
     return (unsigned char)((77 * r + 150 * g + 29 * b) >> 8);
 }
 
-// Pegar pixel seguro (bordas = 0)
 unsigned char get_px(int x, int y) {
     if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) return 0;
     return img_gray[y * WIDTH + x];
@@ -44,7 +43,7 @@ int main()
 {
     alt_putstr("=== SOBEL PARALELO (2 PIXELS/CLOCK) ===\n");
 
-    // 1. Resetar Hardware (Pulso no ResetProc)
+    // Resetar Hardware (Pulso no ResetProc)
     IOWR_ALTERA_AVALON_PIO_DATA(PIO_RESET_BASE, 1);
     usleep(10);
     IOWR_ALTERA_AVALON_PIO_DATA(PIO_RESET_BASE, 0);
@@ -53,9 +52,7 @@ int main()
     PERF_RESET(PCM_BASE);
     PERF_START_MEASURING(PCM_BASE);
 
-    // =========================================================
-    // SE«√O 1: Software (RGB -> Gray)
-    // =========================================================
+    // SE√á√ÉO 1: Software (RGB -> Gray)
     PERF_BEGIN(PCM_BASE, 1);
 
     int i, x, y;
@@ -65,18 +62,16 @@ int main()
 
     PERF_END(PCM_BASE, 1);
 
-    // =========================================================
-    // SE«√O 2: Hardware (Acelerador via PIO)
-    // =========================================================
+    // SE√á√ÉO 2: Hardware
     PERF_BEGIN(PCM_BASE, 2);
 
     // Loop pulando de 2 em 2 pixels, pois calculamos 2 por vez
-    // ComeÁamos em 1 e vamos atÈ WIDTH-3 para ter vizinhos v·lidos
+    // Come√ßamos em 1 e vamos at√© WIDTH-3 para ter vizinhos v√°lidos
 
     // Loop principal: O x deve ser o centro do primeiro Sobel (Sobel 0)
         for(y = 1; y < HEIGHT - 1; y++) {
-            // x comeÁa em 1, e pula de 2 em 2
-            // O ˙ltimo pixel lido no pacote È x+2 (se for WIDTH-1, È o limite)
+            // x come√ßa em 1, e pula de 2 em 2
+            // O √∫ltimo pixel lido no pacote √© x+2 (se for WIDTH-1, √© o limite)
             for(x = 1; x < WIDTH - 2; x += 2) {
 
                 // 1. Preparar os dados (Janela 3x3 + 1 extra por linha)
@@ -103,32 +98,30 @@ int main()
                     (get_px(x+1, y+1) << 8)  |
                     get_px(x+2, y+1); // P8 a P11
 
-                // PIO ENTRADA 4: Necess·rio para fornecer P12, P13, P14
-                // P12, P13, P14 s„o lidos de Pin_4 (31:24), (23:16), (15:8)
-                // Eles n„o tÍm relaÁ„o com a janela 3x3 atual, ent„o preenchemos com ZEROs.
+                // PIO ENTRADA 4: Necess√°rio para fornecer P12, P13, P14
+                // P12, P13, P14 s√£o lidos de Pin_4 (31:24), (23:16), (15:8)
+                // Eles n√£o t√™m rela√ß√£o com a janela 3x3 atual, ent√£o preenchemos com ZEROs.
                 // Se o VHDL estiver configurado para um Sobel 4x4, isso precisaria de 4 linhas.
 
-                // Usamos 0 para evitar que lixo de memÛria cause o ruÌdo claro
+                // Usamos 0 para evitar que lixo de mem√≥ria cause o ru√≠do claro
                 IOWR_ALTERA_AVALON_PIO_DATA(PIO_IN4_BASE, 0);
-                // Se vocÍ SOUBER exatamente qual pixel P12, P13, P14 o Sobel est· usando,
-                // vocÍ deve inseri-lo aqui. Assumindo que eles s„o ignorados:
 
-                // 2. Escrever nos PIOs
+                // Escrever nos PIOs
                 IOWR_ALTERA_AVALON_PIO_DATA(PIO_IN1_BASE, pixels_cima);
                 IOWR_ALTERA_AVALON_PIO_DATA(PIO_IN2_BASE, pixels_meio);
                 IOWR_ALTERA_AVALON_PIO_DATA(PIO_IN3_BASE, pixels_baixo);
                 IOWR_ALTERA_AVALON_PIO_DATA(PIO_IN4_BASE, 0); // PIO 4 com zeros.
 
-                // 3. Dar Pulso de Start
+                // Dar Pulso de Start
                 IOWR_ALTERA_AVALON_PIO_DATA(PIO_GO_BASE, 1);
                 while(IORD_ALTERA_AVALON_PIO_DATA(PIO_DONE_BASE) == 0);
 
-                // 4. Ler Resultado
+                // Ler Resultado
                 unsigned char res0 = IORD_ALTERA_AVALON_PIO_DATA(PIO_OUT0_BASE);
                 unsigned char res1 = IORD_ALTERA_AVALON_PIO_DATA(PIO_OUT1_BASE);
                 IOWR_ALTERA_AVALON_PIO_DATA(PIO_GO_BASE, 0);
 
-                // Salvar no buffer de saÌda:
+                // Salvar no buffer de sa√≠da:
                 // Sobel 0 usa (x-1, x, x+1) -> centrado em x
                 img_sobel[y * WIDTH + x] = res0;
 
@@ -140,9 +133,7 @@ int main()
     PERF_END(PCM_BASE, 2);
     PERF_STOP_MEASURING(PCM_BASE);
 
-    // =========================================================
-    // RelatÛrio
-    // =========================================================
+    // Relat√≥rio 
     alt_putstr("\n--- PERFORMANCE ---\n");
     perf_print_formatted_report((void*) PCM_BASE, ALT_CPU_FREQ, 2, "RGB_SW", "SOBEL_HW_2X");
 

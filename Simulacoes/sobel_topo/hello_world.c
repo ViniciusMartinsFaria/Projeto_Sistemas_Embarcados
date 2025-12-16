@@ -16,7 +16,6 @@
     #endif
 #endif
 
-// Definições de Hardware (Qsys)
 #ifndef ENTRADA_1_BASE
     #define ENTRADA_1_BASE      ENTRADA_1_BASE
     #define ENTRADA_2_BASE      ENTRADA_2_BASE
@@ -29,14 +28,14 @@
 unsigned char img_gray_input[WIDTH * HEIGHT]; // Buffer para o Cinza
 unsigned char img_out[WIDTH * HEIGHT];        // Buffer final do Sobel
 
-// Função de Conversão (Formula rápida)
+// FunÃ§Ã£o de ConversÃ£o (Formula rÃ¡pida)
 unsigned char rgb_to_gray(unsigned char r, unsigned char g, unsigned char b) {
     // (77R + 150G + 29B) >> 8
     unsigned int temp = (77 * r) + (150 * g) + (29 * b);
     return (unsigned char)(temp >> 8);
 }
 
-// Função auxiliar para pegar do buffer cinza
+// FunÃ§Ã£o auxiliar para pegar do buffer cinza
 unsigned char get_pixel_gray(int x, int y) {
     if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) return 0;
     return img_gray_input[y * WIDTH + x];
@@ -51,9 +50,7 @@ int main()
 
     int x, y, i;
 
-    // =================================================================
-    // CONVERSÃO RGB -> GRAY (SOFTWARE)
-    // =================================================================
+    // CONVERSÃƒO RGB -> GRAY (SOFTWARE)
     PERF_BEGIN(PCM_BASE, 1);
 
     for(i = 0; i < WIDTH * HEIGHT; i++) {
@@ -66,9 +63,7 @@ int main()
 
     PERF_END(PCM_BASE, 1);
 
-    // =================================================================
     // FILTRO SOBEL (HARDWARE)
-    // =================================================================
     PERF_BEGIN(PCM_BASE, 2);
 
     for(y = 1; y < HEIGHT - 1; y++) {
@@ -93,9 +88,7 @@ int main()
     PERF_END(PCM_BASE, 2);
     PERF_STOP_MEASURING(PCM_BASE);
 
-    // =================================================================
     // RESULTADOS
-    // =================================================================
     alt_putstr("\n--- PERFORMANCE (64x64) ---\n");
     perf_print_formatted_report((void*) PCM_BASE, ALT_CPU_FREQ, 2, "RGB_to_Gray", "Sobel_HW");
 
