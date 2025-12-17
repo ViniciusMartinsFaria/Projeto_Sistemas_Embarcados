@@ -10,7 +10,7 @@ entity sobel_topo is
         entrada_1           : in std_logic_vector(31 downto 0);
         entrada_2           : in std_logic_vector(31 downto 0);
         entrada_3           : in std_logic_vector(31 downto 0);
-        pixel               : out std_logic_vector(15 downto 0) 
+        pixel               : out std_logic_vector(7 downto 0) 
     );
 end sobel_topo;
 
@@ -43,13 +43,13 @@ architecture RTL of sobel_topo is
     port(
         Gx          : in  std_logic_vector(15 downto 0);
         Gy          : in  std_logic_vector(15 downto 0);
-        saida       : out std_logic_vector(15 downto 0));
+        saida       : out std_logic_vector(7 downto 0));
     end component;
 
     signal bloco_sg     : matriz;
     signal Gx_sg        : std_logic_vector(15 downto 0);
     signal Gy_sg        : std_logic_vector(15 downto 0);
-    signal saida_sg     : std_logic_vector(15 downto 0);
+    signal saida_sg     : std_logic_vector(7 downto 0);
 
 begin
 

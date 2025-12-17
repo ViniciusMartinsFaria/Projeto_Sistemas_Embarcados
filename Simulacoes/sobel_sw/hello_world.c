@@ -20,18 +20,14 @@
     #define HEIGHT 64
 #endif
 
-// Buffers na Memória
 unsigned char img_gray[WIDTH * HEIGHT]; // Buffer intermediário (Cinza)
 unsigned char img_out[WIDTH * HEIGHT];  // Buffer final (Sobel)
 
-// Converte RGB para Escala de Cinza (Método Rápido)
 unsigned char rgb_to_gray(unsigned char r, unsigned char g, unsigned char b) {
-    // Fórmula: (77R + 150G + 29B) / 256
     unsigned int temp = (77 * r) + (150 * g) + (29 * b);
     return (unsigned char)(temp >> 8);
 }
 
-// Pega pixel com segurança (retorna 0 se for borda/fora)
 unsigned char get_pixel(int x, int y) {
     if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) return 0;
     return img_gray[y * WIDTH + x];
@@ -94,11 +90,10 @@ int main()
 
 
     alt_putstr("\n--- TEMPOS DE EXECUCAO (Ciclos de Clock) ---\n");
-    // Seção 1 = RGB->Gray, Seção 2 = Sobel SW
     perf_print_formatted_report((void*) PCM_BASE, ALT_CPU_FREQ, 2, "RGB_Gray_SW", "Sobel_SW");
 
     alt_putstr("\n--- DADOS DA IMAGEM PROCESSADA (HEX) ---\n");
-    // Imprime a matriz completa para verificação externa
+    // Imprime a matriz completa
     for(i = 0; i < WIDTH * HEIGHT; i++) {
         alt_printf("%x ", img_out[i]);
 

@@ -28,14 +28,11 @@
 unsigned char img_gray_input[WIDTH * HEIGHT]; // Buffer para o Cinza
 unsigned char img_out[WIDTH * HEIGHT];        // Buffer final do Sobel
 
-// Função de Conversão (Formula rápida)
 unsigned char rgb_to_gray(unsigned char r, unsigned char g, unsigned char b) {
-    // (77R + 150G + 29B) >> 8
     unsigned int temp = (77 * r) + (150 * g) + (29 * b);
     return (unsigned char)(temp >> 8);
 }
 
-// Função auxiliar para pegar do buffer cinza
 unsigned char get_pixel_gray(int x, int y) {
     if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) return 0;
     return img_gray_input[y * WIDTH + x];
@@ -43,7 +40,7 @@ unsigned char get_pixel_gray(int x, int y) {
 
 int main()
 {
-    alt_putstr("=== SOBEL 64x64: RGB Separado -> Gray -> HW ===\n");
+    alt_putstr("=== SOBEL 64x64: RGB -> Gray -> HW ===\n");
 
     PERF_RESET(PCM_BASE);
     PERF_START_MEASURING(PCM_BASE);

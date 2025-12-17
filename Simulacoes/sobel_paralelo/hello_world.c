@@ -52,7 +52,7 @@ int main()
     PERF_RESET(PCM_BASE);
     PERF_START_MEASURING(PCM_BASE);
 
-    // SEÇÃO 1: Software (RGB -> Gray)
+    // Software (RGB -> Gray)
     PERF_BEGIN(PCM_BASE, 1);
 
     int i, x, y;
@@ -62,7 +62,7 @@ int main()
 
     PERF_END(PCM_BASE, 1);
 
-    // SEÇÃO 2: Hardware
+    // hardware
     PERF_BEGIN(PCM_BASE, 2);
 
     // Loop pulando de 2 em 2 pixels, pois calculamos 2 por vez
@@ -121,7 +121,6 @@ int main()
                 unsigned char res1 = IORD_ALTERA_AVALON_PIO_DATA(PIO_OUT1_BASE);
                 IOWR_ALTERA_AVALON_PIO_DATA(PIO_GO_BASE, 0);
 
-                // Salvar no buffer de saída:
                 // Sobel 0 usa (x-1, x, x+1) -> centrado em x
                 img_sobel[y * WIDTH + x] = res0;
 
@@ -137,7 +136,7 @@ int main()
     alt_putstr("\n--- PERFORMANCE ---\n");
     perf_print_formatted_report((void*) PCM_BASE, ALT_CPU_FREQ, 2, "RGB_SW", "SOBEL_HW_2X");
 
-    // Imprimir
+    // Imprimir no terminal
     alt_putstr("\n--- SAIDA SOBEL (HEX) ---\n");
     for(y = 0; y < HEIGHT; y++) {
         for(x = 0; x < WIDTH; x++) {
